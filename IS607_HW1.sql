@@ -37,27 +37,27 @@ WHERE year='2013' AND month='1' AND tailnum IS NULL;
 # Write this statement first using an INNER JOIN, then using a LEFT OUTER JOIN. How do your results compare?
 
 # INNER JOIN
-SELECT planes.manufacturer,(flights.distance)
+SELECT planes.manufacturer, SUM(flights.distance)
 FROM flights
 INNER JOIN planes
 ON flights.tailnum=planes.tailnum
 WHERE flights.year='2013' AND flights.month='7' AND flights.day='5'
 GROUP BY manufacturer;
 # manufacturer,SUM(distance)
-# 'AIRBUS','1617'
-# 'AIRBUS INDUSTRIE','529'
-# 'AMERICAN AIRCRAFT INC','733'
+# 'AIRBUS','195089'
+# 'AIRBUS INDUSTRIE','78786'
+# 'AMERICAN AIRCRAFT INC','2199'
 # 'BARKER JACK L','937'
-# 'BOEING','1400'
-# 'BOMBARDIER INC','488'
-# 'CANADAIR','228'
-# 'CESSNA','764'
+# 'BOEING','335028'
+# 'BOMBARDIER INC','31160'
+# 'CANADAIR','1142'
+# 'CESSNA','2898'
 # 'DOUGLAS','1089'
-# 'EMBRAER','200'
-# 'GULFSTREAM AEROSPACE','502'
-# 'MCDONNELL DOUGLAS','733'
-# 'MCDONNELL DOUGLAS AIRCRAFT CO','1096'
-# 'MCDONNELL DOUGLAS CORPORATION','1076'
+# 'EMBRAER','77909'
+# 'GULFSTREAM AEROSPACE','1157'
+# 'MCDONNELL DOUGLAS','7486'
+#'MCDONNELL DOUGLAS AIRCRAFT CO','15690'
+# 'MCDONNELL DOUGLAS CORPORATION','4767'
 
 # LEFT OUTTER JOIN -- * no "OUTTER LEFT JOIN" in mySQL, just called "LEFT JOIN"
 SELECT planes.manufacturer,(flights.distance)
