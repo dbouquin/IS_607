@@ -1,0 +1,58 @@
+---
+title: "IS607_HW2"
+author: "Daina Bouquin"
+date: "September 8, 2015"
+output: html_document
+---
+
+***Instructions:***   
+Your task is to choose one dataset, then study the data and its associated description of the data (i.e. “data dictionary”).  You should take the data, and create an R data frame with a subset of the columns (and if you like rows) in the dataset.
+
+------
+
+**Data Set Information:**  
+
+The original dataset is available [here][1].   
+   
+The NASA data set comprises different size NACA 0012 airfoils at various wind tunnel speeds and angles of attack. The span of the airfoil and the observer position were the same in all of the experiments. 
+
+Dataset Donor:
+Dr Roberto Lopez
+robertolopez '@' intelnics.com
+Intelnics
+
+Creators:
+Thomas F. Brooks, D. Stuart Pope and Michael A. Marcolini
+NASA
+
+**This file has the variables:** 
+  
+1. Frequency, in Hertzs.
+2. Angle of attack, in degrees.
+3. Chord length, in meters.
+4. Free-stream velocity, in meters per second.
+5. Suction side displacement thickness, in meters.
+6. Scaled sound pressure level, in decibels. This is the only output.
+
+------
+
+Pull the data from the UCI Machine Learning Repository:
+```{r}
+a_Url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/00291/airfoil_self_noise.dat"
+foil_data <- read.table(file = a_Url, header = FALSE)
+```
+
+Name the columns and convert the table to a dataframe:
+```{r}
+colnames(foil_data) <- c("freq","angle","chord_len","fs_vel","thickness","level")
+foil_data <- data.frame(foil_data)
+class(foil_data)
+head(foil_data)
+```
+
+Create a subset of columns in the dataset.
+```{r}
+output <- foil_data[,6]
+output[1:10]
+```
+[1]: https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise "Airfoil Self-Noise Data Set"
