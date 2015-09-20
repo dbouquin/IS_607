@@ -1,0 +1,78 @@
+---
+title: "IS607_HW4"
+author: "Daina Bouquin"
+date: "September 19, 2015"
+output: html_document
+---
+
+Automated Data Collection in R, Ch. 8 - questions 4-6:
+
+```{r}
+library(stringr)
+```
+
+4. Describe the types of strings that conform to the following regular expresssions and construct an example that is matched by the regular expression.
+
+>a. [0-9]+\\$   
+A character set that searches for digits 0-9 one or more times with a literal $ following the digits.
+```{r}
+ex1 <- "There are 115$ here, and that's a strange way to write $115"
+unlist(str_extract_all(ex1, "[0-9]+\\$")) #note what isn't matched.
+```
+>b. \\b[a-z]{1,4}\\b   
+This searches between word boundaries for lowercase letters a-z that occurs at least once, but at most 4 times.
+```{r}
+ex2 <- "doggie cat dog frog this spanish"
+unlist(str_extract_all(ex2, "\\b[a-z]{1,4}\\b"))
+```
+>c. .*?\\.txt$    
+This seach uses a non-greedy qualifier (the ?) to look for zero or more of any character followed by a literal . and txt at the end of the string.
+
+```{r}
+ex3 <- c("daina.txt", "snake.txt")
+unlist(str_extract_all(ex3, ".*?\\.txt$"))
+```
+>d. \\d{2}/\\d{2}/\\d{4}   
+This is a string that contains 2 digits a slash, 2 digits a slash, then 4 digits and a slash
+```{r}
+ex4 <- "04/12/1989, 10/24/1989"
+unlist(str_extract_all(ex4, "\\d{2}/\\d{2}/\\d{4}"))
+```
+>e. <(.+?)>.+?</\\1>   
+Searches for an open triangle bracket, at least one character, and a closing triangle, followed by at least one character and a bracketed text that matches the first (\1) but has a leading forward slash. 
+```{r}
+ex5 <- c("<b>Daina</b>", "<img>jellfish.png</img>")
+str_extract(ex5, "<(.+?)>.+?</\\1>")
+```
+
+5. Rewrite the expression [0-9]+\\$ in a way that all elements are altered but the expression performs the same task.
+```{r}
+ex1 <- "There are 115$ here, and that's a strange way to write $115"
+unlist(str_extract_all(ex1, "\\d{1,}\\x24")) # hexidecimal for $ is 24
+```
+
+6. Consider the mail address chunkylover53[at]aol[dot]com    
+
+>a. Transform the string to a standard mail format using regular expressions.
+```{r}
+email <- "chunkylover53[at]aol[dot]com"
+email <- str_replace(email, pattern= "\\[at]", replacement = "@")
+email <- str_replace(email, pattern= "\\[dot]", replacement = ".")
+email
+```
+>b. Imagine we are trying to extract the digits in the mail address. To do so we        write the expression [:digit:]. Explain why this fails and correct the expression.   
+
+You must put [:digit:] in quotes and use str_extract_all to get all of the digits:
+```{r}
+unlist(str_extract_all(email, "[:digit:]"))  
+```
+You could add the + quantifier so you get them all at once:
+```{r}
+unlist(str_extract(email, "[:digit:]+")) 
+```
+>c. Instead of using the predefined character classes, we would like to use the predefined symbols to extract the digits in the maill address. To do so we write the expression \\D. Explain why this fails and correct the expression.   
+
+You must use a lowercase d and put it in quotes. D searches for "No digits". You can also grab all the digits at once with a +:
+```{r}
+unlist(str_extract(email, "\\d+")) 
+```
