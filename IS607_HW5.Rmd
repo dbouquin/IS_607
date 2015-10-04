@@ -11,7 +11,7 @@ library(tidyr)
 library(dplyr)
 ```
 
-![This chart describes arrival delays for two airlines across five destinations.](/Users/dainabouquin/Documents/CUNYsps_MS/IS_607/IS607_img1_HW5.png)
+![This chart describes arrival delays for two airlines across five destinations.](https://dl.dropboxusercontent.com/u/105967710/IS607_img1_HW5%20copy.png)
 
 1. Create a CSV file that includes all of the information above. You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations:
 
