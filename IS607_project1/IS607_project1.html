@@ -431,7 +431,7 @@ class(chess_df$pre_rate)</code></pre>
 ## 64     64                   BEN LI    MI          1.0     1163</code></pre>
 <p>Calculate the pre-chess avaerage of a player’s oponents (Player 1 as example):</p>
 <pre class="r"><code># Define Player 1's oponents: 
-op1 &lt;- c(39,21,18,14,7,12,4) # it doesn't seem like I can pull these from IS607_project1_data.txt using regex. Would love to see how others achieved this
+op1 &lt;- c(39,21,18,14,7,12,4) # it doesn't seem like I can pull all player opponent numbers from IS607_project1_data.txt using regex without having to deal with lots of blanks. Would love to see how others achieved this
 
 # Find average rating:
 mean(chess_df[chess_df$number %in% op1, &quot;pre_rate&quot;])</code></pre>
