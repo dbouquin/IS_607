@@ -1,0 +1,86 @@
+---
+title: "IS607_HW5"
+author: "Daina Bouquin"
+date: "October 3, 2015"
+output: html_document
+---
+
+Practicing data clean-up and transformations using `tidyr` and `dplyr`. CRAN documentation available for `tidyr` is available [here](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf) and `dplr` documentation can be found [here](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html).
+```{r, message=FALSE}
+library(tidyr)
+library(dplyr)
+```
+
+![This chart describes arrival delays for two airlines across five destinations.](/Users/dainabouquin/Documents/CUNYsps_MS/IS_607/IS607_img1_HW5.png)
+
+1. Create a CSV file that includes all of the information above. You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations:
+
+```{r}
+# Create a dataframe that contains the data pictured above:
+hw5data <- data.frame(
+  airline = rep(c('Alaska', 'AMWest'), each = 2),
+  status = c('on-time', 'delayed', 'on-time', 'delayed'),
+  LosAngeles = c(497,62,694,117),
+  Phoenix = c(221,12,4840,415),
+  SanDiego = c(212,20,383,65),
+  SanFrancisco = c(503,102,320,129),
+  Seattle = c(1841,305,201,61)
+)
+
+# Write the data to a CSV and save it to current working directory
+write.csv(hw5data, "IS607_HW5_data.csv")
+
+```
+
+2. Read the information from your CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data.  
+
+```{r}
+data <- read.csv("IS607_HW5_data.csv") # Reads in the CSV file
+
+str(data) # check out the structure
+data <- data[,2:7] # remove ID column (X)
+
+data 
+
+```
+
+3. Restructure the data into a more useful format:
+
+```{r}
+tidy_data <- data %>%
+  gather(city, count, -airline, -status) # Convert the data into a long format using gather() from tidyr package
+
+tidy_data 
+
+```
+
+3. Perform analysis to compare the arrival delays for the two airlines.
+
+```{r}
+
+# Calculate total number of flights for each airline using aggregate():
+total_flights <- aggregate(tidy_data$count, by=list(airline=tidy_data$airline), FUN=sum)
+colnames(total_flights) <- c("airline", "count") # name columns in resulting df
+total_flights 
+
+# Sum the total number of delayed flights for each airline using dplyr filter()
+# Alaska delayed flights:
+d_alaska <- filter(tidy_data, airline == "Alaska", status == "delayed")
+d_alaska <- sum(d_alaska$count)
+d_alaska
+
+# AMWest delayed flights:
+d_AMWest <- filter(tidy_data, airline == "AMWest", status == "delayed")
+d_AMWest <- sum(d_AMWest$count)
+d_AMWest
+
+# Calculate the percentage of delayed flights for each airline:
+p_d_alaska <- d_alaska/total_flights$count[1] # percentage of delays with Alaska
+p_d_alaska
+p_d_AMWest <- d_AMWest/total_flights$count[2] # percentage of delays with AMWest
+p_d_AMWest
+
+# Find difference between percentage of delays among airlines using absolute value:
+abs(p_d_AMWest - p_d_alaska)
+
+```
