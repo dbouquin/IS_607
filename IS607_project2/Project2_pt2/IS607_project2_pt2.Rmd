@@ -1,0 +1,82 @@
+---
+title: "Project2_pt2"
+author: "Daina Bouquin"
+date: "October 10, 2015"
+output: html_document
+---
+
+Part 2 of my additional practice with data clean-up and transformations using `tidyr` and `dplyr`. CRAN documentation available for `tidyr` is available [here](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf) and `dplr` documentation can be found [here](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html).
+
+```{r, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(stringr)
+```
+
+This chart presents various details regarding living former Presidents of the United States:
+
+![x](https://dl.dropboxusercontent.com/u/105967710/living_presidents.png)
+
+1. Create a CSV file that includes all of the information above. You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations:
+```{r}
+# CSV file was created in OpenOffice to quickly match the source chart very closely
+# This could also be done using the data.frame() and write.csv() functions.
+```
+2. Read the information from your CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data.  
+```{r}
+presidents <- read.csv("presidents.csv")
+presidents
+```
+Restructure the dataset
+```{r}
+colnames(presidents)
+# Split the Term_of_Office column into two separate columns
+presidents$Start_Term <- lapply(strsplit(as.character(presidents$Term_of_Office), "\\-"), "[", 2)
+presidents$End_Term <- lapply(strsplit(as.character(presidents$Term_of_Office), "\\-"), "[", 1)
+
+# Drop the old column
+presidents <- subset(presidents, select = c(President,DOB,Start_Term,End_Term))
+presidents
+
+# Pull the presidents' age out of the DOB column and create a new Age column
+presidents$Age <- lapply(strsplit(as.character(presidents$DOB), "\\("), "[", 2)
+ages <-  unlist(str_extract_all(presidents$Age, "[[:digit:]]{1,}"))
+presidents$Age <- ages
+presidents
+
+# Drop old DOB column as we will not be using it from here forward
+presidents <- subset(presidents, select = c(President,Start_Term,End_Term,Age))
+presidents
+```
+3. For analysis: 
+  * Give a list of presidents who had one term in office (4 years) and presidents who had two terms in office (8 years)
+  * Which president is the oldest?
+  * What is the average age of all presidents?
+```{r}
+# Give a list of presidents who had one term in office (4 years) and presidents who had two terms in office (8 years)
+
+# Convert term columns to numeric values
+presidents$Start_Term <- as.numeric(presidents$Start_Term)
+presidents$End_Term <- as.numeric(presidents$End_Term)
+
+# Add a column to indicate number of years in office (Just to make final result more clear)
+presidents$Yrs_Office <- abs(presidents$Start_Term-presidents$End_Term)
+
+# Create a table of presidents with two terms 
+terms_2 <- presidents %>% filter(abs(presidents$Start_Term-presidents$End_Term) > 4)
+terms_2
+# Create a table of presidents with one term 
+terms_1 <- presidents %>% filter(abs(presidents$Start_Term-presidents$End_Term) < 5)
+terms_1
+
+# Which president is the oldest?
+
+# Convert age column to numeric
+presidents$Age <- as.numeric(presidents$Age)
+max_age <- presidents %>% slice(which.max(Age))
+max_age
+
+# Find the average age of all presidents
+av_age_pres <- mean(presidents$Age)
+av_age_pres
+```

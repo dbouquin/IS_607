@@ -1,0 +1,21 @@
+---
+title: "Project2_pt3"
+author: "Daina Bouquin"
+date: "October 10, 2015"
+output: html_document
+---
+
+Part 3 of my additional practice with data clean-up and transformations using `tidyr` and `dplyr`. CRAN documentation available for `tidyr` is available [here](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf) and `dplr` documentation can be found [here](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html).
+
+```{r, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(stringr)
+```
+
+This chart lists digital ad revenue by billion(s) of US dollars available via the [Pew Research Center](http://www.journalism.org/media-indicators/digital-u-s-display-advertising-by-company/):
+
+![x](https://dl.dropboxusercontent.com/u/105967710/Screen%20Shot%202015-10-08%20at%203.55.33%20PM.png)
+
+
+The things to analyze are: the total revenue by year and company, average revenue by year and company, and/or compare the revenue of any two or three companies on the table. (The total revenue by year is already included in the online table, but for the purpose of this project, I left it out)
