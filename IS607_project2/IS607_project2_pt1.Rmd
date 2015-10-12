@@ -1,0 +1,114 @@
+---
+title: "Project2_pt1"
+author: "Daina Bouquin"
+date: "October 8, 2015"
+output: html_document
+---
+
+Additional practice with data clean-up and transformations using `tidyr` and `dplyr`. CRAN documentation available for `tidyr` is available [here](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf) and `dplr` documentation can be found [here](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html).
+
+```{r, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+This chart describes past Popes' favorability ratings over time:
+
+![x](https://dl.dropboxusercontent.com/u/105967710/pope_chart%20copy.png)
+
+1. Create a CSV file that includes all of the information above. You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations:
+
+```{r}
+# Create a dataframe
+pope <- c(rep('Francis', 2), rep('Benedict_XVI', 5), rep('JohnPaul_II',5))
+end_date <- as.Date(c("2014-02-09", "2013-04-14", "2010-03-28", "2008-04-20", "2007-06-03", "2005-12-18","2005-05-01","2005-02-27", "2003-10-08", "2002-05-01", "1998-12-29", "1993-08-10")) # Used end date of surveys for favorability rating
+p_favorable <- c(76,58,40,63,52,50,55,78,73,61,86,64)
+p_unfavorable <- c(9,10,35,15,16,11,12,11,17,26,8,15)
+p_no_op = c(16,31,25,22,32,39,33,11,10,13,6,21)
+
+pope_data <- data.frame(pope, end_date, p_favorable, p_unfavorable, p_no_op)
+
+# Write the dataframe to a CSV in current working directory
+write.csv(pope_data, "pope_data.csv")
+
+```
+
+2. Read the information from your CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data.  
+
+```{r}
+# Read the CSV file into R
+popes <- read.csv("pope_data.csv")
+
+# Remove auto-generated indicator column from dataset
+popes <- popes[,2:5]
+
+# Convert the dates column back to date format
+popes$end_date <- as.Date(popes$end_date)
+
+# Check the structure
+str(popes)
+
+```
+Restructure the dataset
+```{r}
+# Create a column indicating favorability with two levels and another column with the   value
+
+# Change the colnames so transformation better populates the new structure
+colnames(popes) <- c("pope", "date", "favorable", "unfavorable")
+
+tidy_popes <- popes %>%
+  gather(favorability, percentage, -pope, -date) # Convert the data into a long format using gather() from tidyr package
+
+str(tidy_popes) 
+
+tidy_popes
+```
+
+3. For analysis: find the net favorables (favorable - unfavorable) and awareness (fav + unfav) for each pope over their full tenure.
+
+```{r}
+f_popes <- filter(tidy_popes, favorability == "favorable")
+u_popes <- filter(tidy_popes, favorability == "unfavorable")
+
+# Create a table to contain all Popes with their net favorability by date
+net_f_popes <- abs(f_popes$percentage - u_popes$percentage)
+n_popes <- f_popes[,1:2]
+n_popes <- cbind(n_popes, net_f_popes)
+
+# Rename the columns to make it cleaner
+colnames(n_popes) <- c("Pope", "Survey_Date", "Net_Favorability")
+n_popes 
+
+# Check out when each Pope was least favorable
+min_net <- n_popes %>% group_by(Pope) %>% slice(which.min(Net_Favorability))
+min_net
+
+# Check out when each Pope was most favorable
+max_net <- n_popes %>% group_by(Pope) %>% slice(which.max(Net_Favorability))
+max_net
+
+# Plot to compare Pope's net favorability over time
+qplot(Survey_Date, Net_Favorability, data = n_popes, stat="identity", geom = "bar", fill = Pope, color = Pope)
+
+# Create a table to contain all Popes with their awareness by date
+aware_popes <- (f_popes$percentage + u_popes$percentage)
+a_popes <- f_popes[,1:2]
+a_popes <- cbind(a_popes, aware_popes)
+
+# Rename the columns to make it cleaner
+colnames(a_popes) <- c("Pope", "Survey_Date", "Percent_Awareness")
+a_popes
+
+# Plot to compare Pope's percent awareness over time
+qplot(Survey_Date, Percent_Awareness, data = a_popes, stat="identity", geom = "bar", fill = Pope, color = Pope)
+
+# Check out when each Pope had the least general awareness
+min_aware <- a_popes %>% group_by(Pope) %>% slice(which.min(Percent_Awareness))
+min_aware
+
+# Check out when each Pope had the most general awareness
+max_aware <- a_popes %>% group_by(Pope) %>% slice(which.max(Percent_Awareness))
+max_aware
+```
+

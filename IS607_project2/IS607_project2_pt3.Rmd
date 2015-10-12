@@ -1,0 +1,88 @@
+---
+title: "Project2_pt3"
+author: "Daina Bouquin"
+date: "October 10, 2015"
+output: html_document
+---
+
+Part 3 of my additional practice with data clean-up and transformations using `tidyr` and `dplyr`. CRAN documentation available for `tidyr` is available [here](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf) and `dplr` documentation can be found [here](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html).
+
+```{r, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(plyr)
+library(ggplot2)
+```
+
+This chart lists digital ad revenue by billion(s) of US dollars available via the [Pew Research Center](http://www.journalism.org/media-indicators/digital-u-s-display-advertising-by-company/):
+
+![x](https://dl.dropboxusercontent.com/u/105967710/Screen%20Shot%202015-10-08%20at%203.55.33%20PM.png)
+
+1. Create a CSV file that includes all of the information above. You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations:
+```{r}
+year <- c('2009','2010','2011','2012','2013')
+google <- c('0.36','0.86','1.67','2.26','2.99')
+facebook <- c('0.56','1.21','1.73','2.18','3.17')
+yahoo <- c('1.26','1.43','1.36','1.35','1.27') 
+microsoft <- c('0.37','0.51','0.60','0.90','0.79')
+aol <- c('0.51','0.47','0.53','0.70','0.73')
+ad_data <- data.frame(year,google,facebook,yahoo,microsoft,aol)
+ad_data
+#Write the CSV
+write.csv(ad_data, "ad_data.csv")
+```
+2. Read the information from your CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data.  
+```{r}
+ad <- read.csv("ad_data.csv")
+ad
+```
+Restructure the dataset
+```{r}
+colnames(ad)
+# Remove X column automatically created by csv import
+ad <- ad[,2:6]
+ad
+# Convert the dataframe to a long format using gather()
+tidy_ad <- ad %>% gather(company, ad_rev, -year)
+# Arrange the data by year
+tidy_ad <- arrange(tidy_ad, year)
+# Check the new structure
+str(tidy_ad)
+tidy_ad
+```
+3. For analysis: total revenue by year and company, average revenue by year and company.
+```{r}
+# Check out the data graphically first to see any general trends in the data
+qplot(year, ad_rev, data = tidy_ad, geom = c("point", "smooth"), method = lm,  facets =  . ~ company)
+
+# Calculate the total revenue by company
+# This can be done using ddply()
+ddply(tidy_ad, .(company), summarise, sum = sum(ad_rev))
+# or tapply()
+tapply(tidy_ad$ad_rev, tidy_ad$company, FUN=sum)
+
+# Calculate the total revenue by year -- this can be done very similarly to the calculation by company
+ddply(tidy_ad, .(year), summarise, sum = sum(ad_rev))
+# or tapply()
+tapply(tidy_ad$ad_rev, tidy_ad$year, FUN=sum)
+
+# Calculate the average revenue by company and year -- also very similar to the last two calculations
+# Average by company using ddply()
+ddply(tidy_ad, .(company), summarise, avg = mean(ad_rev))
+# or tapply()
+tapply(tidy_ad$ad_rev, tidy_ad$company, FUN=mean)
+# Average by year using ddply()
+ddply(tidy_ad, .(year), summarise, avg = mean(ad_rev))
+# or tapply()
+tapply(tidy_ad$ad_rev, tidy_ad$year, FUN=mean)
+```
+To look a further we can check to see what year each company had their highest and lowest revenue by year
+```{r}
+# Company max revenue
+max_rev <- tidy_ad %>% group_by(company) %>% slice(which.max(ad_rev))
+max_rev
+
+# Company min revenue
+min_rev <- tidy_ad %>% group_by(company) %>% slice(which.min(ad_rev))
+min_rev
+```
