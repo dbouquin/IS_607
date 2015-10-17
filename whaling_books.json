@@ -1,0 +1,25 @@
+{
+    "book": [
+        {
+            "title": "Moby-Dick; or, The Whale",
+            "author": ["Herman Melville", "Elizabeth Hardwick (Introduction)", "Rockwell Kent (Illustrator)"],
+            "ISBN": "067978327X",
+            "OriginalPublication": 1851,
+            "OCLC": 44541812
+        },
+        {
+            "title": "In the Heart of the Sea: The Tragedy of the Whaleship Essex",
+            "author": "Nathaniel Philbrick",
+            "ISBN": "0141001828",
+            "OriginalPublication": 2001,
+            "OCLC": 608132810
+        },
+        {
+            "title": "Leviathan: The History of Whaling in America",
+            "author": " Eric Jay Dolin",
+            "ISBN": "0393060578",
+            "OriginalPublication": 24,
+            "OCLC":  	85018314
+        }
+    ]
+}
