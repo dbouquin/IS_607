@@ -1,0 +1,50 @@
+---
+title: "IS607_HW6"
+author: "Daina Bouquin"
+date: "October 15, 2015"
+output: html_document
+---
+
+Pick three of your favorite books on one of your favorite subjects. Write R code, using your packages of choice, to load the information from three different sources containing information about the books (HTML, XML, and JSON) into separate R data frames.  
+
+Are the three data frames identical?
+
+1. Load the necessary libraries
+```{r, message=FALSE}
+library(XML)
+library(jsonlite)
+library(dplyr)
+```
+
+2. Three files were created to meet the stated format requirements: HTML, XML, and JSON. These files contain the following variables on books about the history of American whaling, particularly those stories that influenced Herman Melville's writing of Moby Dick.  
+  
+* Title
+* Author(s)
+* ISBN
+* Original Publication Year
+* OCLC number
+  
+These files were uploaded to my corresponding GitHub repository for this course and can be found [here](https://github.com/dbouquin/IS_607).
+
+3. Read in the [HTML table](https://raw.githubusercontent.com/dbouquin/IS_607/master/whaling_books.html) as a dataframe
+```{r}
+download.file("https://raw.githubusercontent.com/dbouquin/IS_607/master/whaling_books.html","whaling_books.html", method="curl")
+whales_HTML<-readHTMLTable("whaling_books.html", header=TRUE)
+whales_HTML <- as.data.frame(whales_HTML)
+str(whales_HTML)
+```
+
+4. Read in the [XML](https://raw.githubusercontent.com/dbouquin/IS_607/master/whaling_books.xml","whaling_books.xml) file as a dataframe
+```{r}
+download.file("https://raw.githubusercontent.com/dbouquin/IS_607/master/whaling_books.xml","whaling_books.xml", method="curl")
+whales_XML<-xmlToList(xmlParse("whaling_books.xml"))
+whales_XML<-data.frame(do.call(bind_rows, lapply(whales_XML, data.frame, stringsAsFactors=FALSE)))
+str(whales_XML)
+```
+
+5. Read in the [JSON file](https://raw.githubusercontent.com/dbouquin/IS_607/master/whaling_books.json) as a dataframe
+```{r}
+whales_JSON<-data.frame(fromJSON("https://raw.githubusercontent.com/dbouquin/IS_607/master/whaling_books.json"))
+str(whales_JSON)
+```
+6. You can see that the dataframes are each different in multiple ways, not least of which are how they treat column naming, and the variables themselves. For example, the HTML table and JSON format each resulted in dataframes containing 3 observations of 5 variables, however, the XML format resulted in 7 variables for each observation. This is because of how the author variable was treated by R when reading in the XML format. Additionally, the datatypes between the different formats differ greatly; when reading in the data from the XML I specified that strings should not be treated as factors to show the difference between this call and not specifying this parameter as seen with the HTML table wherein all the variables are treated as factors rather than character strings. It would be simple to rename the columns for the tables using the `colnames()` function but the structures and treatment of the variables for each table would still be different.
