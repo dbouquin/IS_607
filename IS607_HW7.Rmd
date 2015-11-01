@@ -28,5 +28,4 @@ class(h_articles) # make sure it's a dataframe
 h_articles[1:10,9] # Show the first 10 headlines from the query 
 
 ```
-
-
+More documentation on using R to fetch JSON data from REST APIs is available [here](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-apis.html)
