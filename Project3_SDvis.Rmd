@@ -1,0 +1,65 @@
+---
+title: "SD_datavis"
+author: "Daina Bouquin"
+date: "October 23, 2015"
+output: html_document
+---
+Additional exploritory analysis
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+It could be interesting to do a comparitive analysis to that done on the Oscars data. For the data regarding the SanDiego awards, is there a visible relationship between winning best editing and winning any of the other awards like best picture?
+
+```{r}
+sdtable$year <- as.factor(sdtable$year)
+sdtable$movie <- as.factor(sdtable$movie)
+
+#Create column based on whether or not best_editing won
+b <- ggplot(sdtable, aes(x=best_editing)) + geom_histogram(binwidth=2,colour="white")
+c <- b + facet_grid(. ~ best_film)
+d <- c + ggtitle("Winning Best Film\n As it Relates to Winning Best Editing")
+d
+```
+Other potentially interesting analyses?
+
+Best actress or best actor correlated more closely with most wins?
+First we pull out a subset from the data where the film won either best actor or best actress
+```{r}
+sdtable$year <- as.factor(sdtable$year)
+sdtable$movie <- as.factor(sdtable$movie)
+
+# Extract all records where movie won best actor or actress
+w_actorORactress <- filter(sdtable, best_actor == 1 | best_actress == 1)
+nrow(w_actorORactress)
+```
+We have 37 films now that have won either best actor or best actress
+
+We filter further to see if any films won both awards
+```{r}
+w_actorANDactress <- filter(sdtable, best_actor == 1 & best_actress == 1)
+nrow(w_actorANDactress)
+w_actorANDactress$movie
+```
+Only American Beauty has won both. In order to simplify this question, we remove this record so we do not create any confounds.
+```{r}
+w_actorORactress <- subset(w_actorORactress, movie!="American Beauty")
+nrow(w_actorORactress)
+```
+Now that we've had a little look at the data, we'll reshape the data and create a column in the dataset to indicate the status of the various awards to see how those awards (particularly the gender-based ones) are related to other awards associated with the movies.
+
+```{r}
+tidy_awards <- w_actorORactress %>%
+  gather(award, award_status, -movie, -year, best_film, best_cinematography, best_director, best_editing)
+
+winners <- filter(tidy_awards, award_status == 1)
+
+#not what I want but getting closer
+# Want to facet other awards by whether or not the film best actor or actress
+a <- ggplot(winners, aes(x=award_status)) + geom_histogram(binwidth=2,colour="white")
+a + facet_grid(. ~ award)
+```
+

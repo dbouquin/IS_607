@@ -1,0 +1,32 @@
+---
+title: "IS607_HW7"
+author: "Daina Bouquin"
+date: "November 1, 2015"
+output: html_document
+---
+
+<h3>Fetching data from New York Times APIs</h3>
+
+The New York Times web site provides a rich set of APIs, as described [here](http://developer.nytimes.com/docs).
+
+1. Sign up for at least one API key  
+2. Choose an API to search and construct an interface in R to read in the JSON data   
+3. Transform the data into an R dataframe   
+
+```{r, message=FALSE}
+library(jsonlite)
+```
+```{r}
+#search for articles with keyword "halloween"
+
+article_key <- "&api-key=e521540e572de04780c19a7788fb0836:5:70863196" # my API key
+url <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=halloween"
+req <- fromJSON(paste0(url, article_key))
+h_articles <- req$response$docs
+colnames(h_articles) # print the column names
+class(h_articles) # make sure it's a dataframe
+h_articles[1:10,9] # Show the first 10 headlines from the query 
+
+```
+
+
