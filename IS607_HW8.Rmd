@@ -1,0 +1,61 @@
+---
+title: "IS607_HW8"
+author: "Daina Bouquin"
+date: "November 10, 2015"
+output: html_document
+---
+
+For this project, predict the class of new documents either withheld from the training dataset ("[spambase](http://archive.ics.uci.edu/ml/datasets/Spambase)") or from another source such as your own spam folder.
+
+To achieve this task I will demonstrate document classification using a supervised machine learning technique called a Support Vector Machines (SVM) and data withheld from the original dataset.
+
+```{r, message=FALSE}
+library(nutshell) # spambase dataset available in clean format in nutshell package
+library(e1071)
+```
+SVMs are supervised learning methods that can be used for classification and regression tasks. This means we are going to be using both a training and a testing dataset to create our classification model. An SVM algorithm generates non-overlapping partitions that typically employ all attributes of a dataset. The entity space is partitioned in a single pass, so that flat and linear partitions are generated. SVMs are based on maximum margin linear discriminants.
+```{r}
+data(spambase) # load the data from the nutshell package
+colnames(spambase) # check which column the dependent variable is in ("is_spam")
+
+# create a training and testing set for our analysis
+i <- 1:nrow(spambase)
+test_i <- sample(i, trunc(length(i)/4)) # slice the dataset into quarters
+testset <- spambase[test_i,] # the test set is 1/4 of the total records
+trainset <- spambase[-test_i,] # the training set is the rest of the dataset
+
+# create a model using the training data
+m <- svm(is_spam~., data = trainset)
+
+# test the model on the testing set leaving out the dependent variable
+prediction <- predict(m, testset[,-58])
+
+# create a confusion matrix to show the true and false positives associated with the model
+cm <- table(pred = prediction, true = testset[,58]) # confusion matrix
+cm
+
+# check the accuracy rates of the model
+classAgreement(cm)
+```
+Because we are working with a training and testing set, we can try altering the sample sizes used to create our train and test set and see how this impacts our model's acuracy.
+```{r}
+# create a new set of training and testing subsets, but this time make the training set much larger
+i2 <- 1:nrow(spambase)
+test_i2 <- sample(i, trunc(length(i2)/8)) # slice the dataset into eighths
+testset2 <- spambase[test_i2,] # the test set is 1/8 of the total records
+trainset2 <- spambase[-test_i2,] # the training set is the rest of the dataset
+
+# create a new model using the new larger training data
+m2 <- svm(is_spam~., data = trainset2)
+
+# test the model on the testing set leaving out the dependent variable
+prediction <- predict(m2, testset2[,-58])
+
+# create a confusion matrix to show the true and false positives associated with the model
+cm2 <- table(pred = prediction, true = testset2[,58]) # confusion matrix
+cm2
+
+# check the accuracy rates of the model
+classAgreement(cm2)
+```
+We can easily see from both the confusion matrices and the `classAgreement()` accuracy rates that increasing the size of the training set improved our model's ability to correctly classify spam from non-spam in the spambase. This shows that with more data the model was able to learn more about how to correctly classify the documents.
